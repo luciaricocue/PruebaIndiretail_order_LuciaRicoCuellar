@@ -27,7 +27,7 @@ Estos son los 6 ficheros a generar (dentro de la carpeta res/):
 
 Los 3 ficheros dados contienen esta información:
 
-## Movimientos de stock
+# Movimientos de stock
 *stock_movements.parquet* contiene esta información:
 
 - StoreId (integer): store code.
@@ -35,7 +35,7 @@ Los 3 ficheros dados contienen esta información:
 - Date (date): inbound/outbound date.
 - Quantity (integer): inbound (+) or outbound (-).
 
-## Movimientos de ventas
+# Movimientos de ventas
 *sales.parquet* contiene esta información:
 
 - StoreId (integer): store code.
@@ -43,7 +43,7 @@ Los 3 ficheros dados contienen esta información:
 - Date (date): date of sale.
 - Quantity (integer): units sold (negative values are returns).
 
-## Identificación de los productos
+# Identificación de los productos
 *products.parquet* contiene esta información:
 
 - ProductRootCode (integer): product root code, without size.
@@ -55,7 +55,7 @@ Los 3 ficheros dados contienen esta información:
 
 Los 6 ficheros generados contendrán esta información:
 
-*interval_stock.parquet* (Cálculo del stock diario)
+# *interval_stock.parquet* (Cálculo del stock diario)
 root
  |-- ProductRootCode: integer (nullable = true)
  |-- StoreId: integer (nullable = true)
@@ -63,39 +63,39 @@ root
  |-- EndDate: timestamp (nullable = true)
  |-- Stock: long (nullable = true)
 
-*daily_stock.parquet* (Cálculo del stock diario)
+# *daily_stock.parquet* (Cálculo del stock diario)
 root
  |-- ProductRootCode: integer (nullable = true)
  |-- StoreId: integer (nullable = true)
  |-- Date: timestamp (nullable = false)
  |-- Stock: long (nullable = true)
 
-*store_benefits.parquet* (KPIs)
+# *store_benefits.parquet* (KPIs)
 root
  |-- Year: integer (nullable = true)
  |-- StoreId: integer (nullable = true)
  |-- Profit: double (nullable = false)
 
-*family_benefits.parquet* (KPIs)
+# *family_benefits.parquet* (KPIs)
 root
  |-- Year: integer (nullable = true)
  |-- Family: string (nullable = true)
  |-- Profit: double (nullable = false)
 
-*store_rotation.parquet* (KPIs)
+# *store_rotation.parquet* (KPIs)
 root
  |-- Year: integer (nullable = true)
  |-- StoreId: integer (nullable = true)
  |-- Turnover: double (nullable = true)
 
-*family_rotation.parquet* (KPIs)
+# *family_rotation.parquet* (KPIs)
 root
  |-- Year: integer (nullable = true)
  |-- Family: string (nullable = true)
  |-- Turnover: double (nullable = true)
 
 
-#PASOS SEGUIDOS (se explica sobre el código con más detalle, aquí se ha indicado lo más relevante)
+# PASOS SEGUIDOS (se explica sobre el código con más detalle, aquí se ha indicado lo más relevante)
 
 #PASO0: Elección de Herramientas
 #PASO0 opcionA (descartada por inviable): 
@@ -142,23 +142,23 @@ root
   Genero 2 ficheros parquet family_benefits y store_benefits
  Se han seguido también tal cual las indicaciones del enunciado
 
-#PASO4.1: Calculo la primera parte del KPI Profit (UnitsSold * RetailPrice)
+ #PASO4.1: Calculo la primera parte del KPI Profit (UnitsSold * RetailPrice)
  Como vimos al principio, en sales hay productos que no están referenciados ok en products porque les falta el RetailPrice en este caso
  79262 filas vamos a quitar: 
 
-##PASO4.2:Calculo la segunda parte del KPI Profit (Inbounds * ProductCost)
+ #PASO4.2:Calculo la segunda parte del KPI Profit (Inbounds * ProductCost)
   Como vimos al principio, en stock_movements realmente no había productos sin estar referenciados en la tabla de los productos, pero al haber quitado los que no tenían RetailPrice, tampoco los consideramos en esta parte aunque si que tengan el SupplierPrice
  11311 filas vamos a quitar
 
-##PASO4.3:
+ #PASO4.3:
  Termino el cálculo del KPI Profit para family_benefits: Hago la resta (UnitsSold * RetailPrice) - (Inbounds * ProductCost)
  Aunque no hay para este caso, si hubiera algún NA-Null, se cambia por 0 (implicaría que no ha habido venta o stock de esa Familia de productos en ningún almacén)
 
-##PASO4.4:
+ #PASO4.4:
  Termino el cálculo del KPI Profit para store_benefits: Hago la resta (UnitsSold * RetailPrice) - (Inbounds * ProductCost)
  En este caso si que hay Stores que no ha tenido ventas registradas, los NA-Null se cambian por 0 para hacer la resta
 
-##PASO4.5:Guardo los .parquet
+ #PASO4.5:Guardo los .parquet
 
 # PASO5: Cálculo del SEGUNDO KPI: Calculo Turnover 
   Turnover=UnitsSold(during the period)/AverageStock(in the period)
@@ -167,7 +167,7 @@ root
 #PASO5.1: Calculo la primera parte del KPI Turnover (el numerador): UnitsSold(during the period)
 #A. Uso el df10 calculado antes:  en el paso 4.1 (Filtro los datos de sales de 2019 y 2020 con Quality positiva y les añado la informacion de Familia y Retail Price)
 
-##PASO5.2:Calculo la segunda parte del KPI Turnover(denominador): AverageStock(in the period)
+#PASO5.2:Calculo la segunda parte del KPI Turnover(denominador): AverageStock(in the period)
 # NOTA1: Esta parte NO podemos hacerla con el DataFrame calculado anteriormente daily_stock, como se pide en en enunciado. 
   Esto es debido a que el fichero daily_stock estaba calculado por ProductRootCode y StoreId
   y a un mismo ProductRootCode pueden corresponderle varias Familias, dependiendo del producto, por lo que no es posible asignar
@@ -179,13 +179,16 @@ root
   por lo que el stock promedio lo vamos a calcular sumando todos y dividiendo entre los días del año
   2019 365 días, pero 2020 366 porque fue bisiesto.
 
-##PASO5.3:
+#PASO5.3:
  Termino el cálculo del KPI Turnover para family_rotation: Hago la división
  Aunque no hay para este caso, si hubiera algún NA-Null, se cambia por 0 (implicaría que no ha habido venta o stock de esa Familia de productos en ningún almacén)
 
-##PASO5.4:
+#PASO5.4:
  Termino el cálculo del KPI Turnover para store_rotation: Hago la división
  En este caso si que hay algún NA-Null, se cambia por 0 (implicaría que no ha habido venta o stock de esa Familia de productos en ningún almacén)
+
+
+
 
 
 
