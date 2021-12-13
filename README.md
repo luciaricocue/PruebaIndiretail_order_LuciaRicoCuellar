@@ -94,7 +94,9 @@ root
  |-- Turnover: double (nullable = true)
 
 
-# PASOS SEGUIDOS (se explica sobre el código con más detalle, aquí se ha indicado lo más relevante)
+# PASOS SEGUIDOS 
+
+Se explica sobre el código con más detalle, aquí se ha indicado lo más relevante
 
 #PASO0: Elección de Herramientas
 #PASO0 opcionA (descartada por inviable): 
