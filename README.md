@@ -1,7 +1,6 @@
-# PruebaIndiretail_order_LuciaRicoCuellar
 # Prueba técnica de ingeniero de datos (stock)
 
-#Contenido:
+# Contenido:
 Código a ejecutar: /src/PruebaIndiretail_order.py
 Datos proporcionados: /dat/*
 Datos de obtenidos: /res/*
@@ -27,7 +26,7 @@ Estos son los 6 ficheros a generar (dentro de la carpeta res/):
 
 Los 3 ficheros dados contienen esta información:
 
-# Movimientos de stock
+#Movimientos de stock
 *stock_movements.parquet* contiene esta información:
 
 - StoreId (integer): store code.
@@ -35,7 +34,7 @@ Los 3 ficheros dados contienen esta información:
 - Date (date): inbound/outbound date.
 - Quantity (integer): inbound (+) or outbound (-).
 
-# Movimientos de ventas
+#Movimientos de ventas
 *sales.parquet* contiene esta información:
 
 - StoreId (integer): store code.
@@ -43,7 +42,7 @@ Los 3 ficheros dados contienen esta información:
 - Date (date): date of sale.
 - Quantity (integer): units sold (negative values are returns).
 
-# Identificación de los productos
+#Identificación de los productos
 *products.parquet* contiene esta información:
 
 - ProductRootCode (integer): product root code, without size.
@@ -55,7 +54,7 @@ Los 3 ficheros dados contienen esta información:
 
 Los 6 ficheros generados contendrán esta información:
 
-# *interval_stock.parquet* (Cálculo del stock diario)
+#*interval_stock.parquet* (Cálculo del stock diario)
 root
  |-- ProductRootCode: integer (nullable = true)
  |-- StoreId: integer (nullable = true)
@@ -63,32 +62,32 @@ root
  |-- EndDate: timestamp (nullable = true)
  |-- Stock: long (nullable = true)
 
-# *daily_stock.parquet* (Cálculo del stock diario)
+#*daily_stock.parquet* (Cálculo del stock diario)
 root
  |-- ProductRootCode: integer (nullable = true)
  |-- StoreId: integer (nullable = true)
  |-- Date: timestamp (nullable = false)
  |-- Stock: long (nullable = true)
 
-# *store_benefits.parquet* (KPIs)
+#*store_benefits.parquet* (KPIs)
 root
  |-- Year: integer (nullable = true)
  |-- StoreId: integer (nullable = true)
  |-- Profit: double (nullable = false)
 
-# *family_benefits.parquet* (KPIs)
+#*family_benefits.parquet* (KPIs)
 root
  |-- Year: integer (nullable = true)
  |-- Family: string (nullable = true)
  |-- Profit: double (nullable = false)
 
-# *store_rotation.parquet* (KPIs)
+#*store_rotation.parquet* (KPIs)
 root
  |-- Year: integer (nullable = true)
  |-- StoreId: integer (nullable = true)
  |-- Turnover: double (nullable = true)
 
-# *family_rotation.parquet* (KPIs)
+#*family_rotation.parquet* (KPIs)
 root
  |-- Year: integer (nullable = true)
  |-- Family: string (nullable = true)
@@ -137,7 +136,7 @@ root
  Más detalle en comentarios del código
 
 
-# PASO4: Cálculo del PRIMER KPI: Calculo Profit 
+#PASO4: Cálculo del PRIMER KPI: Calculo Profit 
   Profit=(UnitsSold * RetailPrice) - (Inbounds * ProductCost)
   Genero 2 ficheros parquet family_benefits y store_benefits
  Se han seguido también tal cual las indicaciones del enunciado
@@ -160,7 +159,7 @@ root
 
  #PASO4.5:Guardo los .parquet
 
-# PASO5: Cálculo del SEGUNDO KPI: Calculo Turnover 
+#PASO5: Cálculo del SEGUNDO KPI: Calculo Turnover 
   Turnover=UnitsSold(during the period)/AverageStock(in the period)
   Genero 2 ficheros parquet family_rotation y store_rotation
 
@@ -168,13 +167,13 @@ root
 #A. Uso el df10 calculado antes:  en el paso 4.1 (Filtro los datos de sales de 2019 y 2020 con Quality positiva y les añado la informacion de Familia y Retail Price)
 
 #PASO5.2:Calculo la segunda parte del KPI Turnover(denominador): AverageStock(in the period)
-# NOTA1: Esta parte NO podemos hacerla con el DataFrame calculado anteriormente daily_stock, como se pide en en enunciado. 
+#NOTA1: Esta parte NO podemos hacerla con el DataFrame calculado anteriormente daily_stock, como se pide en en enunciado. 
   Esto es debido a que el fichero daily_stock estaba calculado por ProductRootCode y StoreId
   y a un mismo ProductRootCode pueden corresponderle varias Familias, dependiendo del producto, por lo que no es posible asignar
   una única familia a cada ProductRootCode, 
   y al hacer el join las filas se van a duplicar en los caso en los que pase esto.
   Vamos a recalcular daily_stock_v2 para familias en vez de ProductRootCode
-# NOTA2:Este fichero no tiene por qué incluir todos los días del año para todas las Familias y Almacenes ya que en periodos de 
+#NOTA2:Este fichero no tiene por qué incluir todos los días del año para todas las Familias y Almacenes ya que en periodos de 
   stock negativo o 0 no hay fila,
   por lo que el stock promedio lo vamos a calcular sumando todos y dividiendo entre los días del año
   2019 365 días, pero 2020 366 porque fue bisiesto.
@@ -186,9 +185,6 @@ root
 #PASO5.4:
  Termino el cálculo del KPI Turnover para store_rotation: Hago la división
  En este caso si que hay algún NA-Null, se cambia por 0 (implicaría que no ha habido venta o stock de esa Familia de productos en ningún almacén)
-
-
-
 
 
 
